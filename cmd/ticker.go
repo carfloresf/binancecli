@@ -26,27 +26,38 @@ var tickerCmd = &cobra.Command{
 		req, _ = http.NewRequest("GET", "https://api.binance.com/api/v3/ticker/price", nil)
 		q := req.URL.Query()
 
-		if len(args) > 0 {
-			q.Add("symbol", args[0])
-		}
+		if len(args) == 0 {
+			resp, er = client.Do(req)
+			if er != nil {
+				fmt.Printf("The HTTP request failed with error %s\n", er)
+			} else {
+				data, _ := ioutil.ReadAll(resp.Body)
+				var tickers []Ticker
+				json.Unmarshal(data, &tickers)
 
-		req.URL.RawQuery = q.Encode()
-		resp, er = client.Do(req)
+				fmt.Println("Found", len(tickers), "pairs in Binance")
 
-		if er != nil {
-			fmt.Printf("The HTTP request failed with error %s\n", er)
-		} else {
-			data, _ := ioutil.ReadAll(resp.Body)
-			print(string(data))
-			var tickers []Ticker
-			json.Unmarshal(data, &tickers)
-
-			fmt.Println("Found", len(tickers), "pairs in Binance")
-
-			for i, ti := range tickers {
-				fmt.Println(i, ti.Symbol, ti.Price)
+				for _, ti := range tickers {
+					fmt.Println(ti.Symbol + " - " + ti.Price)
+				}
 			}
+		} else if len(args) == 1 {
+			q.Add("symbol", args[0])
+			req.URL.RawQuery = q.Encode()
+			resp, er = client.Do(req)
+
+			if er != nil {
+				fmt.Printf("The HTTP request failed with error %s\n", er)
+			} else {
+				data, _ := ioutil.ReadAll(resp.Body)
+				var ticker Ticker
+				json.Unmarshal(data, &ticker)
+				fmt.Println(ticker.Symbol + " - " + ticker.Price)
+			}
+		} else {
+			fmt.Println("Too many arguments")
 		}
+
 	},
 }
 
