@@ -30,7 +30,7 @@ var tickerCmd = &cobra.Command{
 			log.Fatalf("Problems: %s", errq)
 		}
 		q := req.URL.Query()
-
+		fmt.Printf(string(len(args)))
 		if len(args) == 0 {
 			resp, errdo = client.Do(req)
 			if errdo != nil {
@@ -60,6 +60,7 @@ var tickerCmd = &cobra.Command{
 				log.Fatalf("Problems: %s", errdo.Error())
 			} else {
 				data, errio := ioutil.ReadAll(resp.Body)
+				fmt.Printf(string(data))
 				if errio != nil {
 					log.Fatalf("Problems: %s", errio)
 				}
