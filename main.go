@@ -1,7 +1,15 @@
 package main
 
-import "./cmd"
+import (
+	"log"
+
+	"github.com/hellerox/binancecli/cmd"
+)
 
 func main() {
-	cmd.RootCmd.Execute()
+	err := cmd.RootCmd.Execute()
+	if err != nil {
+		log.Fatalf("Problems: %s", err.Error())
+	}
+
 }

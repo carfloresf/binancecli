@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/spf13/cobra"
 )
 
+// DayTicker is used to output a standard structure (marshalled as JSON)
 type DayTicker struct {
 	Symbol             string `symbol:"symbol"`
 	PriceChange        string `priceChange:"priceChange"`
@@ -37,22 +39,34 @@ var dayTickerCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		var resp *http.Response
 		var req *http.Request
-		var er error
+		var errr error
+		var er1 error
 
 		client := &http.Client{}
-		req, _ = http.NewRequest("GET", "https://api.binance.com/api/v1/ticker/24hr", nil)
+		req, errr = http.NewRequest("GET", "https://api.binance.com/api/v1/ticker/24hr", nil)
+		if errr != nil {
+			log.Fatalf("Problems: %s", errr.Error())
+		}
+
 		q := req.URL.Query()
-		resp, er = client.Do(req)
+
 		q.Add("symbol", args[0])
 		req.URL.RawQuery = q.Encode()
-		resp, er = client.Do(req)
+		resp, er1 = client.Do(req)
 
-		if er != nil {
-			fmt.Printf("The HTTP request failed with error %s\n", er)
+		if er1 != nil {
+			log.Fatalf("The HTTP request failed with error %s\n", er1)
 		} else {
-			data, _ := ioutil.ReadAll(resp.Body)
+			data, er2 := ioutil.ReadAll(resp.Body)
+			if er2 != nil {
+				log.Fatalf("Problems during unmarshalling: %s", er2.Error())
+			}
+
 			var ticker DayTicker
-			json.Unmarshal(data, &ticker)
+			err := json.Unmarshal(data, &ticker)
+			if err != nil {
+				log.Fatalf("Problems during unmarshalling: %s", err.Error())
+			}
 			fmt.Printf("%+v\n", ticker)
 		}
 	},

@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/spf13/cobra"
 )
 
+// ResponseTime is used to output a standard structure (marshalled as JSON)
 type ResponseTime struct {
 	ServerTime int `serverTime:"number"`
 }
@@ -21,10 +23,15 @@ var timeCmd = &cobra.Command{
 		if er != nil {
 			fmt.Printf("The HTTP request failed with error %s\n", er)
 		} else {
-			data, _ := ioutil.ReadAll(resp.Body)
-
+			data, errio := ioutil.ReadAll(resp.Body)
+			if errio != nil {
+				log.Fatalf("Problems: %s", errio.Error())
+			}
 			var responseTime ResponseTime
-			json.Unmarshal(data, &responseTime)
+			err := json.Unmarshal(data, &responseTime)
+			if err != nil {
+				log.Fatalf("Problems unmarshaling response: %s", err.Error())
+			}
 
 			fmt.Println(responseTime.ServerTime)
 		}
