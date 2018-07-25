@@ -20,8 +20,8 @@ install:
 
 script:
 - FILE="1" ./scripts/test.sh
-- go build -ldflags "-X main.configPath=/opt/bamboo/config/ -X main.version=${VERSION}" -o build/opt/bamboo/bin/bamboo
-- ./scripts/travis/generatePackages.sh
+- go build -ldflags "-X main.configPath=/opt/bamboo/config/ -X main.version=${VERSION}" -o build/opt/binancecli
+
 
 after_failure:
 - reports-publisher
@@ -29,11 +29,5 @@ after_failure:
 after_success:
 - reports-publisher
 
-deploy:
-- provider: script
-  skip_cleanup: true
-  script: "./scripts/travis/publishBinaries.sh"
-  on:
-    branch: master
 
 

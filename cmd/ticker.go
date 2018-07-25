@@ -27,10 +27,9 @@ var tickerCmd = &cobra.Command{
 		client := &http.Client{}
 		req, errq := http.NewRequest("GET", "https://api.binance.com/api/v3/ticker/price", nil)
 		if errq != nil {
-			log.Fatalf("Problems: %s", errq)
+			log.Fatalf("Problems with NewRequest: %s", errq)
 		}
 		q := req.URL.Query()
-
 		if len(args) == 0 {
 			resp, errdo = client.Do(req)
 			if errdo != nil {
