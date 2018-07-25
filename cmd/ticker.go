@@ -27,10 +27,9 @@ var tickerCmd = &cobra.Command{
 		client := &http.Client{}
 		req, errq := http.NewRequest("GET", "https://api.binance.com/api/v3/ticker/price", nil)
 		if errq != nil {
-			log.Fatalf("Problems: %s", errq)
+			log.Fatalf("Problems with NewRequest: %s", errq)
 		}
 		q := req.URL.Query()
-		fmt.Printf(string(len(args)))
 		if len(args) == 0 {
 			resp, errdo = client.Do(req)
 			if errdo != nil {
@@ -60,7 +59,6 @@ var tickerCmd = &cobra.Command{
 				log.Fatalf("Problems: %s", errdo.Error())
 			} else {
 				data, errio := ioutil.ReadAll(resp.Body)
-				fmt.Printf(string(data))
 				if errio != nil {
 					log.Fatalf("Problems: %s", errio)
 				}
